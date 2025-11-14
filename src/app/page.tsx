@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   IconButton,
@@ -17,12 +15,28 @@ import {
   Link,
   CardActions,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import EmailIcon from "@mui/icons-material/Email";
 import { useRouter } from "next/navigation";
 import { projectsData } from "./data/projectsData";
+
+import styled from "styled-components";
+import { motion } from "framer-motion";
+import Type from "@/app/components/type";
+import Header from "./components/header";
+
+
+const Title = styled(motion.h1)`
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+`;
+
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const router = useRouter();
@@ -32,6 +46,7 @@ export default function HomePage() {
     if (section) {
       section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    console.log(mobileMenuOpen );
     setMobileMenuOpen(false);
   };
 
@@ -43,48 +58,7 @@ export default function HomePage() {
   return (
     <Box sx={{ bgcolor: "background.default", color: "text.primary" }}>
       {/* Navbar */}
-      <AppBar position="sticky" color="inherit" elevation={1}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            sx={{ flexGrow: 1, cursor: "pointer" }}
-            onClick={() => handleNavClick("home")}
-          >
-            Vinojith
-          </Typography>
-          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-            <Button onClick={() => handleNavClick("home")}>Home</Button>
-            <Button onClick={() => handleNavClick("about")}>About</Button>
-            <Button onClick={() => handleNavClick("projects")}>Projects</Button>
-            <Button onClick={() => handleNavClick("contact")}>Contact</Button>
-          </Box>
-          <IconButton
-            edge="end"
-            sx={{ display: { xs: "flex", md: "none" } }}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <Box
-          sx={{
-            display: { xs: "flex", md: "none" },
-            flexDirection: "column",
-            p: 2,
-            gap: 1,
-            bgcolor: "grey.100",
-          }}
-        >
-          <Button onClick={() => handleNavClick("home")}>Home</Button>
-          <Button onClick={() => handleNavClick("about")}>About</Button>
-          <Button onClick={() => handleNavClick("projects")}>Projects</Button>
-          <Button onClick={() => handleNavClick("contact")}>Contact</Button>
-        </Box>
-      )}
+      <Header />
 
       {/* Hero Section */}
       <Box
@@ -99,12 +73,23 @@ export default function HomePage() {
           p: 4,
         }}
       >
-        <Typography variant="h2" gutterBottom>
-          Welcome to My Portfolio
-        </Typography>
+        {/* <h1 style={{ paddingBottom: 15 }} className="heading">
+          Hi There!{" "}
+          <span className="wave" role="img" aria-labelledby="wave">
+            👋🏻
+          </span>
+        </h1> */}
+        <Title
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          I am Sanjith
+        </Title>
+        <Type />
         <Typography variant="h6" gutterBottom sx={{ maxWidth: 600 }}>
-          I am a Software Engineer passionate about building modern
-          applications.
+          I am an aspiring Electronic Engineer who loves sharing my experience
+          with community.
         </Typography>
         <Button
           variant="contained"
@@ -126,10 +111,11 @@ export default function HomePage() {
           align="center"
           sx={{ maxWidth: 800, mx: "auto" }}
         >
-          I am a software engineer with experience in building scalable web and
-          mobile applications. I specialize in Golang, Flutter, React, and cloud
-          infrastructure. I love solving problems and creating meaningful
-          solutions.
+          Working on advanced FPGA/DSP modem systems with involvement in the
+          entire pipeline — MATLAB modeling, system design, RTL development, and
+          hardware deployment. This end-to-end responsibility has helped me
+          build both the technical depth and the architectural view needed to
+          deliver efficient and reliable designs.
         </Typography>
       </Container>
 
@@ -213,7 +199,7 @@ export default function HomePage() {
             variant="h6"
             color="primary"
           >
-            vinojithab17@gmail.com
+            shansanjithofficial@gmail.com
           </Link>
         </Box>
       </Container>
@@ -230,24 +216,24 @@ export default function HomePage() {
         }}
       >
         <Typography variant="body2">
-          © {new Date().getFullYear()} Vinojith. All rights reserved.
+          © {new Date().getFullYear()} Sanjith. All rights reserved.
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
           <IconButton
             component="a"
-            href="https://github.com/Vinojithab17"
+            href="https://github.com/sanjith1999"
             target="_blank"
           >
             <GitHubIcon />
           </IconButton>
           <IconButton
             component="a"
-            href="https://www.linkedin.com/in/vinojith-g/"
+            href="https://www.linkedin.com/in/sanjith-shanmugathashan-1377571b8/"
             target="_blank"
           >
             <LinkedInIcon />
           </IconButton>
-          <IconButton component="a" href="mailto:vinojithab17@gmail.com">
+          <IconButton component="a" href="mailto:shansanjithofficial@gmail.com">
             <EmailIcon />
           </IconButton>
         </Box>

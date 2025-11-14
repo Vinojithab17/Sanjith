@@ -218,20 +218,18 @@ export default function ProjectDetailsPage() {
             </Box>
           )}
 
-           {isSmallScreen && (
-               <>
-                                   <Typography variant="h6" noWrap>
-                  {project.title}
-                </Typography>
-                <Box sx={{height:"20px"}}></Box>
-          </>
+          {isSmallScreen && (
+            <>
+              <Typography variant="h6" noWrap>
+                {project.title}
+              </Typography>
+              <Box sx={{ height: "20px" }}></Box>
+            </>
           )}
-       
-
 
           {/* Scrollable Content */}
           <Grid container spacing={2}>
-            {project.sections.map((section) => (
+            {/* {project.sections.map((section) => (
               <Grid size={{ xs: 12 }} key={section.id}>
                 <Paper
                   sx={{
@@ -246,7 +244,14 @@ export default function ProjectDetailsPage() {
                     {section.heading}
                   </Typography>
                   {section.content.map((paragraph, i) => (
-                    <Typography key={i} component="p" sx={{ mb: 2 }}>
+                    <Typography
+                      key={i}
+                      component="p"
+                      sx={{
+                        mb: 2,
+                        textAlign: "justify",
+                      }}
+                    >
                       {paragraph}
                     </Typography>
                   ))}
@@ -266,7 +271,90 @@ export default function ProjectDetailsPage() {
                   )}
                 </Paper>
               </Grid>
-            ))}
+            ))} */}
+            {project.sections.map((section) => (
+  <Grid size={{ xs: 12 }} key={section.id}>
+    <Paper
+      sx={{
+        p: 3,
+        borderRadius: 2,
+        boxShadow: 3,
+        scrollMarginTop: "80px",
+      }}
+      id={section.id}
+    >
+      <Typography variant="h5" gutterBottom>
+        {section.heading}
+      </Typography>
+
+      {section.content.map((paragraph, i) => (
+        <Typography
+          key={i}
+          component="p"
+          sx={{
+            mb: 2,
+            textAlign: "justify",
+          }}
+        >
+          {paragraph}
+        </Typography>
+      ))}
+
+      {section.image && (
+        <Box
+          component="img"
+          src={section.image}
+          alt={section.heading}
+          sx={{
+            display: "block",
+            mx: "auto",
+            width: { xs: "80%", sm: "60%", md: "50%" },
+            borderRadius: 2,
+            mt: 2,
+          }}
+        />
+      )}
+
+      {/* ---- SUBSECTIONS ---- */}
+      {section.subSections && section.subSections.length > 0 && (
+        <Box sx={{ mt: 4 }}>
+          {section.subSections.map((sub) => (
+            <Box key={sub.id} sx={{ mt: 3 }}>
+              {sub.heading && (<Typography variant="h6" gutterBottom>
+                {sub.heading}
+              </Typography> )}
+              {sub.content?.map((paragraph, i) => (
+                <Typography
+                  key={i}
+                  component="p"
+                  sx={{ mb: 2, textAlign: "justify" }}
+                >
+                  {paragraph}
+                </Typography>
+              ))}
+
+              {sub.image && (
+                <Box
+                  component="img"
+                  src={sub.image}
+                  alt={sub.heading}
+                  sx={{
+                    display: "block",
+                    mx: "auto",
+                    width: { xs: "80%", sm: "60%", md: "50%" },
+                    borderRadius: 2,
+                    mt: 2,
+                  }}
+                />
+              )}
+            </Box>
+          ))}
+        </Box>
+      )}
+    </Paper>
+  </Grid>
+))}
+
           </Grid>
         </Box>
 
