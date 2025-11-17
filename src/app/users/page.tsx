@@ -50,26 +50,4 @@ export default function UsersPage() {
   );
 }
 
-// app/users/page.tsx
-// import { getDb } from "@/lib/db";
-
-// export default async function UsersPage() {
-//   const db = await getDb("portfolio");
-//   const users = await db.collection("users").find({}).toArray();
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-xl font-bold mb-4">User List</h1>
-//       <ul className="space-y-2">
-//         {users.map((user) => (
-//           <li key={user._id.toString()} className="p-3 border rounded-lg">
-//             <p><strong>{user.name}</strong></p>
-//             <p>{user.email}</p>
-//             <p>{user.role}</p>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
 

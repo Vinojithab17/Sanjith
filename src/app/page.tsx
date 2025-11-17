@@ -19,12 +19,14 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import EmailIcon from "@mui/icons-material/Email";
 import { useRouter } from "next/navigation";
-import { projectsData } from "./data/projectsData";
+import { Project } from "./data/projectsData";
 
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import Type from "@/app/components/type";
 import Header from "./components/header";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 
 const Title = styled(motion.h1)`
@@ -38,9 +40,20 @@ const Title = styled(motion.h1)`
 `;
 
 export default function HomePage() {
+
+    const [projects, setProjects] = useState<Project[]>([]);
+
+  async function fetchAll() {
+    const res = await axios.get("/api/projects");
+    setProjects(res.data);
+  }
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const router = useRouter();
-  const recentProjects = projectsData.slice(-3);
+  const recentProjects = projects.slice(-3);
   const handleNavClick = (id: string) => {
     const section = document.getElementById(id);
     if (section) {
@@ -53,6 +66,11 @@ export default function HomePage() {
   const handleViewDetails = (projectId: string | number) => {
     window.scrollTo(0, 0);
     router.push(`/project/${projectId}`);
+  };
+
+    const AdminViewAll = () => {
+    window.scrollTo(0, 0);
+    router.push(`/admin/projects`);
   };
 
   return (
@@ -98,6 +116,14 @@ export default function HomePage() {
           onClick={() => handleNavClick("projects")}
         >
           View My Work
+        </Button>
+                <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 3 }}
+          onClick={() => AdminViewAll()}
+        >
+          Admin View All Projects
         </Button>
       </Box>
 
@@ -145,7 +171,7 @@ export default function HomePage() {
                 <CardActions>
                   <Button
                     size="small"
-                    onClick={() => handleViewDetails(project.id)}
+                    onClick={() => handleViewDetails(project._id??"")}
                   >
                     View Details →
                   </Button>

@@ -21,7 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     // Next.js App Router doesn’t have Router.events like pages directory
     // We can simulate it using pathname change
     handleComplete(); // stop loading on initial render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [pathname]);
 
   return (

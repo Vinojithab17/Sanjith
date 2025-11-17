@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 interface LogoProps {
   size?: string;
   className?: string;
-  imageSrc?: string;
+  imageSrc: string;
 }
 
 const LogoContainer = styled(motion.div)<{ size?: string }>`
@@ -43,7 +43,7 @@ const Logo: React.FC<LogoProps> = ({ size, className, imageSrc }) => {
         <AvatarImage src={imageSrc} alt="Avatar" size={size} />
       ) : (
         <LogoText>S</LogoText>
-      )}
+      )}    
     </LogoContainer>
   );
 };

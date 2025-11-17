@@ -1,10 +1,9 @@
 // app/api/users/route.ts
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const db = await getDb("portfolio"); 
     const body = await request.json();
 
     const result = await db.collection("users").insertOne({
@@ -24,7 +23,6 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const db = await getDb("portfolio");
     const users = await db.collection("users").find({}).toArray();
 
     return NextResponse.json({ success: true, users });

@@ -1,6 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { projectsData } from "../data/projectsData";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import HomeIcon from "@mui/icons-material/Home";
 
@@ -23,24 +22,8 @@ import {
   Toolbar,
   IconButton,
 } from "@mui/material";
-
-// Project type definition
-// interface Project {
-//   id: number | string;
-//   title: string;
-//   description: string;
-//   longDescription: string;
-//   technologies: string[];
-//   features: string[];
-//   challenges: string[];
-//   solutions: string[];
-//   image: string;
-//   githubLink: string;
-//   liveLink: string;
-//   duration: string;
-//   teamSize: string;
-//   role: string;
-// }
+import axios from "axios";
+import { Project } from "../data/projectsData";
 
 export default function AllProjects() {
   const [filter, setFilter] = useState("all");
@@ -52,8 +35,18 @@ export default function AllProjects() {
     router.push(`/project/${projectId}`);
   };
 
-  const allProjects = projectsData
+  // const allProjects = projectsData
 
+  const [allProjects, setProjects] = useState<Project[]>([]);
+
+  async function fetchAll() {
+    const res = await axios.get("/api/projects");
+    setProjects(res.data);
+  }
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
   // Filter projects
   // const filteredProjects = allProjects.filter((project) => {
   //   const matchesFilter =
@@ -64,22 +57,22 @@ export default function AllProjects() {
   //   return matchesFilter && matchesSearch;
   // });
 
-// Filter projects
-const filteredProjects = allProjects
-  .filter((project) => {
-    const matchesFilter =
-      filter === "all" || project.technologies.includes(filter);
-    const matchesSearch =
-      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  })
-  .sort((a, b) => {
-    // Ensure numeric comparison even if id is string
-    const idA = typeof a.id === "string" ? parseInt(a.id, 10) : a.id;
-    const idB = typeof b.id === "string" ? parseInt(b.id, 10) : b.id;
-    return idB - idA; // descending → last element (highest id) first
-  });
+  // Filter projects
+  const filteredProjects = allProjects
+    .filter((project) => {
+      const matchesFilter =
+        filter === "all" || project.technologies.includes(filter);
+      const matchesSearch =
+        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesFilter && matchesSearch;
+    })
+    // .sort((a, b) => {
+    //   // Ensure numeric comparison even if id is string
+    //   const idA = typeof a.id === "string" ? parseInt(a.id, 10) : a.id;
+    //   const idB = typeof b.id === "string" ? parseInt(b.id, 10) : b.id;
+    //   return idB - idA; // descending → last element (highest id) first
+    // });
 
   const handleBackToHome = () => {
     router.push("/"); // navigate to home
@@ -92,26 +85,26 @@ const filteredProjects = allProjects
 
   return (
     <Box sx={{ p: 3 }}>
-    <AppBar position="sticky" color="inherit" elevation={1}>
-      <Toolbar>
-        {/* Home icon */}
-        <IconButton
-          edge="start"
-          color="inherit"
-          onClick={handleBackToHome}
-          sx={{ mr: 2 }}
-        >
-          <HomeIcon />
-        </IconButton>
+      <AppBar position="sticky" color="inherit" elevation={1}>
+        <Toolbar>
+          {/* Home icon */}
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={handleBackToHome}
+            sx={{ mr: 2 }}
+          >
+            <HomeIcon />
+          </IconButton>
 
-        <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button onClick={handleBackToHome}>← View All Projects</Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
-    <Box sx={{height:"30px"}}></Box>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button onClick={handleBackToHome}>← View All Projects</Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ height: "30px" }}></Box>
       {/* Header */}
       <Box sx={{ mb: 3, textAlign: "center" }}>
         {/* <Button onClick={handleBackToHome} variant="outlined" sx={{ mb: 2 }}>
@@ -171,7 +164,7 @@ const filteredProjects = allProjects
       {/* Projects Grid */}
       <Grid container spacing={3}>
         {filteredProjects.map((project) => (
-          <Grid size={{ xs: 12 }} key={project.id}>
+          <Grid size={{ xs: 12 }} key={project._id}>
             <Card
               sx={{
                 display: "flex",
@@ -186,12 +179,12 @@ const filteredProjects = allProjects
             >
               {/* Image */}
 
-<CardMedia
-    component="img"
-    sx={{ width: { xs: "100%", sm: 250 }, height: 200 }}
-    image={project.image} 
-    alt={project.title}
-  />
+              <CardMedia
+                component="img"
+                sx={{ width: { xs: "100%", sm: 250 }, height: 200 }}
+                image={project.image}
+                alt={project.title}
+              />
               {/* Content */}
               <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
                 <CardContent sx={{ flexGrow: 1 }}>
@@ -215,7 +208,7 @@ const filteredProjects = allProjects
                   <Box
                     sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}
                   >
-                    {project.technologies.map((tech, index) => (
+                    {project.technologies.map((tech: string, index: number) => (
                       <Typography
                         key={index}
                         variant="caption"
@@ -236,7 +229,7 @@ const filteredProjects = allProjects
                 <CardActions>
                   <Button
                     size="small"
-                    onClick={() => handleViewDetails(project.id)}
+                    onClick={() => handleViewDetails(project._id??"")}
                   >
                     View Details →
                   </Button>
