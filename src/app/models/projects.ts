@@ -1,5 +1,5 @@
 // models/Project.ts
-import mongoose, { Document, Model } from "mongoose";
+import mongoose, { Document, Model } from 'mongoose';
 
 export interface SubSection {
   id: string;
@@ -18,6 +18,7 @@ export interface Section {
 }
 
 export interface ProjectDoc extends Document {
+  visibility: boolean;
   title: string;
   description: string;
   longDescription: string;
@@ -60,6 +61,7 @@ const SectionSchema = new mongoose.Schema(
 
 const ProjectSchema = new mongoose.Schema(
   {
+    visibility: Boolean,
     title: { type: String, required: true },
     description: String,
     longDescription: String,
@@ -81,9 +83,9 @@ const ProjectSchema = new mongoose.Schema(
 let ProjectModel: Model<ProjectDoc>;
 
 try {
-  ProjectModel = mongoose.model<ProjectDoc>("Project");
+  ProjectModel = mongoose.model<ProjectDoc>('Project');
 } catch {
-  ProjectModel = mongoose.model<ProjectDoc>("Project", ProjectSchema);
+  ProjectModel = mongoose.model<ProjectDoc>('Project', ProjectSchema);
 }
 
 export default ProjectModel;

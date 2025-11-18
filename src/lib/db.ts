@@ -24,7 +24,7 @@
 //     global._mongoClientPromise = client.connect();
 //   }
 //   clientPromise = global._mongoClientPromise;
-// } 
+// }
 
 // export default clientPromise;
 
@@ -34,14 +34,12 @@
 //   return client.db(dbName);
 // };
 
-
-import { MongoClient } from "mongodb";
+import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI!;
 const client = new MongoClient(uri);
 
-export const db = client.db("portfolio"); // change your db name
-
+export const db = client.db('portfolio'); // change your db name
 
 // lib/mongodb.ts
 // import mongoose from "mongoose";

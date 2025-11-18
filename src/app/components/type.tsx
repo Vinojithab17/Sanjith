@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import { motion } from "framer-motion";
-import Typewriter from "typewriter-effect";
+import React from 'react';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import Typewriter from 'typewriter-effect';
 
 const TypeContainer = styled(motion.div)`
   font-size: 1.5rem;
@@ -23,12 +23,12 @@ function Type() {
     >
       <Typewriter
         options={{
-          strings: ["DSP/FPGA Engineer", "ENTC Graduate"],
+          strings: ['DSP/FPGA Engineer', 'ENTC Graduate'],
           autoStart: true,
           loop: true,
           deleteSpeed: 100,
-          wrapperClassName: "typewriter-text",
-          cursorClassName: "typewriter-cursor"
+          wrapperClassName: 'typewriter-text',
+          cursorClassName: 'typewriter-cursor',
         }}
       />
     </TypeContainer>

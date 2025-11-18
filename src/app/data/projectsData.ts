@@ -1,6 +1,7 @@
 // Project type definition
 export interface Project {
-  _id?:  string;
+  _id?: string;
+  visibility: boolean;
   title: string;
   description: string;
   longDescription: string;
@@ -39,12 +40,12 @@ export interface Section {
 //     title: "Social Media Analytics",
 //     description:
 //       "A comprehensive analytics platform for tracking social media performance and engagement metrics.",
-//     longDescription: `This social media analytics platform helps businesses and creators understand their social media performance. 
+//     longDescription: `This social media analytics platform helps businesses and creators understand their social media performance.
 //     It provides detailed insights into engagement rates, follower growth, content performance, and audience demographics.
-    
-//     The platform supports multiple social media platforms including Instagram, Twitter, Facebook, and LinkedIn. 
+
+//     The platform supports multiple social media platforms including Instagram, Twitter, Facebook, and LinkedIn.
 //     Users can generate custom reports, set up automated alerts, and track competitor performance.
-    
+
 //     Advanced features include sentiment analysis, hashtag tracking, and predictive analytics for optimal posting times.`,
 //     technologies: [
 //       "React",
@@ -125,8 +126,8 @@ export interface Section {
 //     title: "Micro-Mouse Firmware Design",
 //     description:
 //       "Firmware for a two-wheel micro-mouse robot designed for RoboFest 2023, implementing precise control, navigation, and alignment strategies.",
-//     longDescription: `This project involved designing and implementing firmware for a two-wheel micro-mouse robot for RoboFest-2023. 
-//   The firmware controls wheel speeds, navigation through a maze, and alignment using sensor feedback. 
+//     longDescription: `This project involved designing and implementing firmware for a two-wheel micro-mouse robot for RoboFest-2023.
+//   The firmware controls wheel speeds, navigation through a maze, and alignment using sensor feedback.
 //   The project emphasizes real-time response, precision, and efficient navigation strategies using a combination of PD controllers, sensors, and wheel encoders.`,
 //     technologies: [
 //       "C++",
@@ -329,7 +330,7 @@ export interface Section {
 //     longDescription: `
 //     This project explores the design and implementation of a PID controller for a mobile robot platform.
 //     The objective was to enable smooth and accurate motion control—specifically, speed and position regulation—using feedback from sensors and tuning of PID gains.
-    
+
 //     The robot uses differential drive wheels, encoders for odometry, and the controller adjusts motor commands to minimize error between set‑point and actual motion.
 //     Key goals included reducing overshoot, improving settling time, and ensuring robust performance in varying conditions.
 //   `,

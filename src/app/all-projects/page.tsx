@@ -1,7 +1,7 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import HomeIcon from "@mui/icons-material/Home";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import HomeIcon from '@mui/icons-material/Home';
 
 // ✅ MUI imports
 import {
@@ -21,13 +21,13 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-} from "@mui/material";
-import axios from "axios";
-import { Project } from "../data/projectsData";
+} from '@mui/material';
+import axios from 'axios';
+import { Project } from '../data/projectsData';
 
 export default function AllProjects() {
-  const [filter, setFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
   const handleViewDetails = (projectId: string | number) => {
@@ -40,7 +40,7 @@ export default function AllProjects() {
   const [allProjects, setProjects] = useState<Project[]>([]);
 
   async function fetchAll() {
-    const res = await axios.get("/api/projects");
+    const res = await axios.get('/api/projects/visible');
     setProjects(res.data);
   }
 
@@ -58,55 +58,46 @@ export default function AllProjects() {
   // });
 
   // Filter projects
-  const filteredProjects = allProjects
-    .filter((project) => {
-      const matchesFilter =
-        filter === "all" || project.technologies.includes(filter);
-      const matchesSearch =
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesFilter && matchesSearch;
-    })
-    // .sort((a, b) => {
-    //   // Ensure numeric comparison even if id is string
-    //   const idA = typeof a.id === "string" ? parseInt(a.id, 10) : a.id;
-    //   const idB = typeof b.id === "string" ? parseInt(b.id, 10) : b.id;
-    //   return idB - idA; // descending → last element (highest id) first
-    // });
+  const filteredProjects = allProjects.filter((project) => {
+    const matchesFilter = filter === 'all' || project.technologies.includes(filter);
+    const matchesSearch =
+      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+  // .sort((a, b) => {
+  //   // Ensure numeric comparison even if id is string
+  //   const idA = typeof a.id === "string" ? parseInt(a.id, 10) : a.id;
+  //   const idB = typeof b.id === "string" ? parseInt(b.id, 10) : b.id;
+  //   return idB - idA; // descending → last element (highest id) first
+  // });
 
   const handleBackToHome = () => {
-    router.push("/"); // navigate to home
+    router.push('/'); // navigate to home
   };
 
   // Get unique technologies for filter
-  const allTechnologies = [
-    ...new Set(allProjects.flatMap((project) => project.technologies)),
-  ];
+  const allTechnologies = [...new Set(allProjects.flatMap((project) => project.technologies))];
 
   return (
     <Box sx={{ p: 3 }}>
       <AppBar position="sticky" color="inherit" elevation={1}>
         <Toolbar>
           {/* Home icon */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={handleBackToHome}
-            sx={{ mr: 2 }}
-          >
+          <IconButton edge="start" color="inherit" onClick={handleBackToHome} sx={{ mr: 2 }}>
             <HomeIcon />
           </IconButton>
 
           <Box sx={{ flexGrow: 1 }} />
 
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
             <Button onClick={handleBackToHome}>← View All Projects</Button>
           </Box>
         </Toolbar>
       </AppBar>
-      <Box sx={{ height: "30px" }}></Box>
+      <Box sx={{ height: '30px' }}></Box>
       {/* Header */}
-      <Box sx={{ mb: 3, textAlign: "center" }}>
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
         {/* <Button onClick={handleBackToHome} variant="outlined" sx={{ mb: 2 }}>
           ← Back to Home
         </Button> */}
@@ -121,10 +112,10 @@ export default function AllProjects() {
       {/* Controls */}
       <Box
         sx={{
-          display: "flex",
+          display: 'flex',
           gap: 2,
-          flexWrap: "wrap",
-          justifyContent: "center",
+          flexWrap: 'wrap',
+          justifyContent: 'center',
           mb: 3,
         }}
       >
@@ -138,11 +129,7 @@ export default function AllProjects() {
 
         <FormControl size="small" sx={{ minWidth: 180 }}>
           <InputLabel>Filter by Tech</InputLabel>
-          <Select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            label="Filter by Tech"
-          >
+          <Select value={filter} onChange={(e) => setFilter(e.target.value)} label="Filter by Tech">
             <MenuItem value="all">All Technologies</MenuItem>
             {allTechnologies.map((tech) => (
               <MenuItem key={tech} value={tech}>
@@ -154,10 +141,7 @@ export default function AllProjects() {
       </Box>
 
       {/* Stats */}
-      <Typography
-        variant="body2"
-        sx={{ textAlign: "center", mb: 2, color: "text.secondary" }}
-      >
+      <Typography variant="body2" sx={{ textAlign: 'center', mb: 2, color: 'text.secondary' }}>
         Showing {filteredProjects.length} of {allProjects.length} projects
       </Typography>
 
@@ -167,11 +151,11 @@ export default function AllProjects() {
           <Grid size={{ xs: 12 }} key={project._id}>
             <Card
               sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
                 boxShadow: 3,
                 borderRadius: 3,
-                overflow: "hidden",
+                overflow: 'hidden',
                 p: 2, // ✅ padding inside card
                 m: 1, // ✅ margin between cards
                 gap: 2, // ✅ space between image & content
@@ -181,22 +165,18 @@ export default function AllProjects() {
 
               <CardMedia
                 component="img"
-                sx={{ width: { xs: "100%", sm: 250 }, height: 200 }}
+                sx={{ width: { xs: '100%', sm: 250 }, height: 200 }}
                 image={project.image}
                 alt={project.title}
               />
               {/* Content */}
-              <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h6" component="div">
                     {project.title}
                   </Typography>
 
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
                     {project.duration} • {project.role}
                   </Typography>
 
@@ -205,9 +185,7 @@ export default function AllProjects() {
                   </Typography>
 
                   {/* Technologies */}
-                  <Box
-                    sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}
-                  >
+                  <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {project.technologies.map((tech: string, index: number) => (
                       <Typography
                         key={index}
@@ -215,8 +193,8 @@ export default function AllProjects() {
                         sx={{
                           px: 1,
                           py: 0.3,
-                          bgcolor: "grey.200",
-                          borderRadius: "8px",
+                          bgcolor: 'grey.200',
+                          borderRadius: '8px',
                         }}
                       >
                         {tech}
@@ -227,10 +205,7 @@ export default function AllProjects() {
 
                 {/* Actions */}
                 <CardActions>
-                  <Button
-                    size="small"
-                    onClick={() => handleViewDetails(project._id??"")}
-                  >
+                  <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
                     View Details →
                   </Button>
                   {project.liveLink && (
@@ -264,7 +239,7 @@ export default function AllProjects() {
 
       {/* Empty State */}
       {filteredProjects.length === 0 && (
-        <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
           <Typography variant="h6">No projects found</Typography>
           <Typography variant="body2" color="text.secondary">
             Try adjusting your search or filter criteria

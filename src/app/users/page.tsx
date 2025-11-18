@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 type User = {
   _id: string;
@@ -17,13 +17,13 @@ export default function UsersPage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const res = await fetch("/api/users");
+        const res = await fetch('/api/users');
         const data = await res.json();
         if (data.success) {
           setUsers(data.users);
         }
       } catch (err) {
-        console.error("Failed to fetch users:", err);
+        console.error('Failed to fetch users:', err);
       } finally {
         setLoading(false);
       }
@@ -40,7 +40,9 @@ export default function UsersPage() {
       <ul className="space-y-2">
         {users.map((user) => (
           <li key={user._id} className="p-3 border rounded-lg">
-            <p><strong>{user.name}</strong></p>
+            <p>
+              <strong>{user.name}</strong>
+            </p>
             <p>{user.email}</p>
             <p>{user.role}</p>
           </li>
@@ -49,5 +51,3 @@ export default function UsersPage() {
     </div>
   );
 }
-
-

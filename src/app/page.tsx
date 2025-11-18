@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   Typography,
   Button,
@@ -14,20 +14,19 @@ import {
   Paper,
   Link,
   CardActions,
-} from "@mui/material";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import EmailIcon from "@mui/icons-material/Email";
-import { useRouter } from "next/navigation";
-import { Project } from "./data/projectsData";
+} from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import EmailIcon from '@mui/icons-material/Email';
+import { useRouter } from 'next/navigation';
+import { Project } from './data/projectsData';
 
-import styled from "styled-components";
-import { motion } from "framer-motion";
-import Type from "@/app/components/type";
-import Header from "./components/header";
-import { useEffect, useState } from "react";
-import axios from "axios";
-
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import Type from '@/app/components/type';
+import Header from './components/header';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Title = styled(motion.h1)`
   font-size: 3.5rem;
@@ -40,11 +39,10 @@ const Title = styled(motion.h1)`
 `;
 
 export default function HomePage() {
-
-    const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   async function fetchAll() {
-    const res = await axios.get("/api/projects");
+    const res = await axios.get('/api/projects/visible');
     setProjects(res.data);
   }
 
@@ -57,9 +55,9 @@ export default function HomePage() {
   const handleNavClick = (id: string) => {
     const section = document.getElementById(id);
     if (section) {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    console.log(mobileMenuOpen );
+    console.log(mobileMenuOpen);
     setMobileMenuOpen(false);
   };
 
@@ -68,13 +66,13 @@ export default function HomePage() {
     router.push(`/project/${projectId}`);
   };
 
-    const AdminViewAll = () => {
-    window.scrollTo(0, 0);
-    router.push(`/admin/projects`);
-  };
+  // const AdminViewAll = () => {
+  //   window.scrollTo(0, 0);
+  //   router.push(`/admin/projects`);
+  // };
 
   return (
-    <Box sx={{ bgcolor: "background.default", color: "text.primary" }}>
+    <Box sx={{ bgcolor: 'background.default', color: 'text.primary' }}>
       {/* Navbar */}
       <Header />
 
@@ -82,12 +80,12 @@ export default function HomePage() {
       <Box
         id="home"
         sx={{
-          minHeight: "80vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          textAlign: "center",
+          minHeight: '80vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          textAlign: 'center',
           p: 4,
         }}
       >
@@ -106,25 +104,19 @@ export default function HomePage() {
         </Title>
         <Type />
         <Typography variant="h6" gutterBottom sx={{ maxWidth: 600 }}>
-          I am an aspiring Electronic Engineer who loves sharing my experience
-          with community.
+          I am an aspiring Electronic Engineer who loves sharing my experience with community.
         </Typography>
         <Button
           variant="contained"
           color="primary"
           sx={{ mt: 3 }}
-          onClick={() => handleNavClick("projects")}
+          onClick={() => handleNavClick('projects')}
         >
           View My Work
         </Button>
-                <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3 }}
-          onClick={() => AdminViewAll()}
-        >
+        {/* <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick={() => AdminViewAll()}>
           Admin View All Projects
-        </Button>
+        </Button> */}
       </Box>
 
       {/* About Section */}
@@ -132,16 +124,11 @@ export default function HomePage() {
         <Typography variant="h4" align="center" gutterBottom>
           About Me
         </Typography>
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{ maxWidth: 800, mx: "auto" }}
-        >
-          Working on advanced FPGA/DSP modem systems with involvement in the
-          entire pipeline — MATLAB modeling, system design, RTL development, and
-          hardware deployment. This end-to-end responsibility has helped me
-          build both the technical depth and the architectural view needed to
-          deliver efficient and reliable designs.
+        <Typography variant="body1" align="center" sx={{ maxWidth: 800, mx: 'auto' }}>
+          Working on advanced FPGA/DSP modem systems with involvement in the entire pipeline —
+          MATLAB modeling, system design, RTL development, and hardware deployment. This end-to-end
+          responsibility has helped me build both the technical depth and the architectural view
+          needed to deliver efficient and reliable designs.
         </Typography>
       </Container>
 
@@ -153,7 +140,7 @@ export default function HomePage() {
         <Grid container spacing={4}>
           {recentProjects.map((project, idx) => (
             <Grid key={idx} size={{ xs: 12, md: 4 }}>
-              <Card sx={{ borderRadius: 2, boxShadow: 3, height: "100%" }}>
+              <Card sx={{ borderRadius: 2, boxShadow: 3, height: '100%' }}>
                 <CardMedia
                   component="img"
                   height="200"
@@ -169,10 +156,7 @@ export default function HomePage() {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button
-                    size="small"
-                    onClick={() => handleViewDetails(project._id??"")}
-                  >
+                  <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
                     View Details →
                   </Button>
                   {project.liveLink && (
@@ -202,7 +186,7 @@ export default function HomePage() {
             </Grid>
           ))}
         </Grid>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <Button variant="contained" href="/all-projects">
             View All Projects →
           </Button>
@@ -215,16 +199,10 @@ export default function HomePage() {
           Contact Me
         </Typography>
         <Typography variant="body1" align="center" sx={{ mb: 3 }}>
-          I am always open to new opportunities and interesting projects. Feel
-          free to reach out!
+          I am always open to new opportunities and interesting projects. Feel free to reach out!
         </Typography>
-        <Box sx={{ textAlign: "center" }}>
-          <Link
-            href="mailto:vinojithab17@gmail.com"
-            underline="hover"
-            variant="h6"
-            color="primary"
-          >
+        <Box sx={{ textAlign: 'center' }}>
+          <Link href="mailto:vinojithab17@gmail.com" underline="hover" variant="h6" color="primary">
             shansanjithofficial@gmail.com
           </Link>
         </Box>
@@ -237,19 +215,15 @@ export default function HomePage() {
         sx={{
           mt: 8,
           p: 3,
-          textAlign: "center",
-          bgcolor: "grey.100",
+          textAlign: 'center',
+          bgcolor: 'grey.100',
         }}
       >
         <Typography variant="body2">
           © {new Date().getFullYear()} Sanjith. All rights reserved.
         </Typography>
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
-          <IconButton
-            component="a"
-            href="https://github.com/sanjith1999"
-            target="_blank"
-          >
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}>
+          <IconButton component="a" href="https://github.com/sanjith1999" target="_blank">
             <GitHubIcon />
           </IconButton>
           <IconButton
