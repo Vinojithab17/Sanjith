@@ -28,6 +28,7 @@ import { useParams, useRouter } from 'next/navigation';
 import HomeIcon from '@mui/icons-material/Home';
 import CircleIcon from '@mui/icons-material/Circle';
 import { Project, Section, SubSection } from '@/app/data/projectsData';
+import LoadingBackdrop from '@/app/components/LoadingBackdrop';
 
 const drawerWidth = 240;
 
@@ -39,14 +40,14 @@ export default function ProjectDetailsPage() {
   const params = useParams();
   const projectId = params?.id as string;
   const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingProject, setProjectLoading] = useState(true);
 
   // Fetch project from API
   useEffect(() => {
     if (!projectId) return;
 
     async function fetchProject() {
-      setLoading(true);
+      setProjectLoading(true);
       try {
         const res = await fetch(`/api/projects/${projectId}`);
         if (!res.ok) throw new Error('Failed to fetch project');
@@ -55,19 +56,21 @@ export default function ProjectDetailsPage() {
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false);
+        setProjectLoading(false);
       }
     }
 
     fetchProject();
   }, [projectId]);
+  useEffect(() => {
+    // This runs only when the page mounts
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('hide-loader'));
+    }
+  }, []);
 
-  if (loading) {
-    return (
-      <Container sx={{ py: 8 }}>
-        <Typography>Loading...</Typography>
-      </Container>
-    );
+  if (loadingProject) {
+    return <LoadingBackdrop open={loadingProject} />;
   }
 
   if (!project) {

@@ -24,14 +24,26 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { Project } from '../data/projectsData';
+import LoadingBackdrop from '../components/LoadingBackdrop';
+import ProjectCardSkeleton from '../components/ProjectSkeliton';
 
 export default function AllProjects() {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
   const router = useRouter();
 
+  // const handleViewDetails = (projectId: string | number) => {
+  //   window.scrollTo(0, 0);
+  //   router.push(`/project/${projectId}`);
+  // };
   const handleViewDetails = (projectId: string | number) => {
+    setLoading(true);
     window.scrollTo(0, 0);
+
     router.push(`/project/${projectId}`);
   };
 
@@ -39,13 +51,29 @@ export default function AllProjects() {
 
   const [allProjects, setProjects] = useState<Project[]>([]);
 
+  // async function fetchAll() {
+  //   const res = await axios.get('/api/projects/visible');
+  //   setProjects(res.data);
+  // }
   async function fetchAll() {
-    const res = await axios.get('/api/projects/visible');
-    setProjects(res.data);
+    try {
+      setLoadingProjects(true);
+      const res = await axios.get('/api/projects/visible');
+      setProjects(res.data);
+    } finally {
+      setLoadingProjects(false);
+    }
   }
 
   useEffect(() => {
     fetchAll();
+  }, []);
+
+  useEffect(() => {
+    // This runs only when the page mounts
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('hide-loader'));
+    }
   }, []);
   // Filter projects
   // const filteredProjects = allProjects.filter((project) => {
@@ -147,98 +175,107 @@ export default function AllProjects() {
 
       {/* Projects Grid */}
       <Grid container spacing={3}>
-        {filteredProjects.map((project) => (
-          <Grid size={{ xs: 12 }} key={project._id}>
-            <Card
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                boxShadow: 3,
-                borderRadius: 3,
-                overflow: 'hidden',
-                p: 2, // ✅ padding inside card
-                m: 1, // ✅ margin between cards
-                gap: 2, // ✅ space between image & content
-              }}
-            >
-              {/* Image */}
+        {loadingProjects
+          ? Array.from(new Array(3)).map((_, index) => (
+              <Grid key={index} size={{ xs: 12 }}>
+                <ProjectCardSkeleton />
+              </Grid>
+            ))
+          : filteredProjects.map((project) => (
+              <Grid size={{ xs: 12 }} key={project._id}>
+                <Card
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    boxShadow: 3,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    p: 2, // ✅ padding inside card
+                    m: 1, // ✅ margin between cards
+                    gap: 2, // ✅ space between image & content
+                  }}
+                >
+                  {/* Image */}
 
-              <CardMedia
-                component="img"
-                sx={{ width: { xs: '100%', sm: 250 }, height: 200 }}
-                image={project.image}
-                alt={project.title}
-              />
-              {/* Content */}
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {project.title}
-                  </Typography>
-
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {project.duration} • {project.role}
-                  </Typography>
-
-                  <Typography variant="body2" color="text.secondary">
-                    {project.description}
-                  </Typography>
-
-                  {/* Technologies */}
-                  <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    {project.technologies.map((tech: string, index: number) => (
-                      <Typography
-                        key={index}
-                        variant="caption"
-                        sx={{
-                          px: 1,
-                          py: 0.3,
-                          bgcolor: 'grey.200',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        {tech}
+                  <CardMedia
+                    component="img"
+                    sx={{ width: { xs: '100%', sm: 250 }, height: 200 }}
+                    image={project.image}
+                    alt={project.title}
+                  />
+                  {/* Content */}
+                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h6" component="div">
+                        {project.title}
                       </Typography>
-                    ))}
-                  </Box>
-                </CardContent>
 
-                {/* Actions */}
-                <CardActions>
-                  <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
-                    View Details →
-                  </Button>
-                  {project.liveLink && (
-                    <Button
-                      size="small"
-                      component="a"
-                      href={project.liveLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Live Demo
-                    </Button>
-                  )}
-                  {project.githubLink && (
-                    <Button
-                      size="small"
-                      component="a"
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Source Code
-                    </Button>
-                  )}
-                </CardActions>
-              </Box>
-            </Card>
-          </Grid>
-        ))}
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        {project.duration} • {project.role}
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary">
+                        {project.description}
+                      </Typography>
+
+                      <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {project.technologies.map((tech: string, index: number) => (
+                          <Typography
+                            key={index}
+                            variant="caption"
+                            sx={(theme) => ({
+                              px: 1,
+                              py: 0.3,
+                              borderRadius: '8px',
+                              bgcolor:
+                                theme.palette.mode === 'light'
+                                  ? theme.palette.grey[200] // light mode background
+                                  : theme.palette.grey[800], // dark mode background
+                              color: theme.palette.text.primary,
+                            })}
+                          >
+                            {tech}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </CardContent>
+
+                    {/* Actions */}
+                    <CardActions>
+                      <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
+                        View Details →
+                      </Button>
+                      {project.liveLink && (
+                        <Button
+                          size="small"
+                          component="a"
+                          href={project.liveLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Live Demo
+                        </Button>
+                      )}
+                      {project.githubLink && (
+                        <Button
+                          size="small"
+                          component="a"
+                          href={project.githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Source Code
+                        </Button>
+                      )}
+                    </CardActions>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
       </Grid>
 
       {/* Empty State */}
-      {filteredProjects.length === 0 && (
+      {!loadingProjects && filteredProjects.length === 0 && (
         <Box sx={{ textAlign: 'center', mt: 4 }}>
           <Typography variant="h6">No projects found</Typography>
           <Typography variant="body2" color="text.secondary">
@@ -246,6 +283,7 @@ export default function AllProjects() {
           </Typography>
         </Box>
       )}
+      <LoadingBackdrop open={loading} />
     </Box>
   );
 }

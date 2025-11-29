@@ -1,43 +1,140 @@
-// app/layout.tsx
-'use client'; // needed for state and router events
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation'; // App Router hooks
-import { Backdrop, CircularProgress } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  SpeedDial,
+  SpeedDialAction,
+  Popper,
+  Paper,
+  Typography,
+} from '@mui/material';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
+
+import {
+  charcoalDarkTheme,
+  coralPinkTheme,
+  goldenAmberTheme,
+  midnightBlueDarkTheme,
+  softBlueTheme,
+  softGreenTheme,
+  warmGrayTheme,
+  softTealTheme,
+  slateBlueTheme,
+  slateBlueDarkishTheme,
+  slateBlueDarkerTheme2,
+  neutralGreyTheme,
+} from './theme';
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
+const themes = {
+  charcoalDarkTheme,
+  coralPinkTheme,
+  goldenAmberTheme,
+  midnightBlueDarkTheme,
+  softBlueTheme,
+  softGreenTheme,
+  warmGrayTheme,
+  softTealTheme,
+  slateBlueTheme,
+  slateBlueDarkishTheme,
+  slateBlueDarkerTheme2,
+  neutralGreyTheme,
+};
+
 export default function RootLayout({ children }: RootLayoutProps) {
-  const [loading, setLoading] = useState(false);
-  const pathname = usePathname(); // triggers effect on route change
+  const [currentTheme, setCurrentTheme] = useState(neutralGreyTheme);
+  const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  useEffect(() => {
-    // Stop loading after route change
-    const handleComplete = () => setLoading(false);
 
-    // Next.js App Router doesn’t have Router.events like pages directory
-    // We can simulate it using pathname change
-    handleComplete(); // stop loading on initial render
-  }, [pathname]);
+  const themeActions = Object.keys(themes).map((key) => ({
+    name: key,
+    theme: themes[key as keyof typeof themes],
+    color: themes[key as keyof typeof themes].palette.primary.main,
+  }));
+
+  const handleHover = (event: React.MouseEvent<HTMLElement>, themeName: string) => {
+    setHoveredTheme(themeName);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLeave = () => {
+    setHoveredTheme(null);
+    setAnchorEl(null);
+  };
 
   return (
     <html lang="en">
       <body>
-        {/* Spinner overlay */}
-        <Backdrop
-          open={loading}
-          sx={{
-            color: '#1976d2',
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-          }}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+        <ThemeProvider theme={currentTheme}>
+          <CssBaseline />
+          {children}
 
-        {/* Main content */}
-        <main>{children}</main>
+          {/* Floating Theme Selector */}
+          <SpeedDial
+            ariaLabel="Select Theme"
+            sx={{ position: 'fixed', bottom: 16, right: 16 }}
+            icon={<ColorLensIcon />}
+            direction="up"
+          >
+            {themeActions.map((action) => (
+              <SpeedDialAction
+                key={action.name}
+                icon={
+                  <Box
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      bgcolor: action.color,
+                      borderRadius: '50%',
+                    }}
+                  />
+                }
+                onClick={() => setCurrentTheme(action.theme)}
+                onMouseEnter={(e) => handleHover(e, action.name)}
+                onMouseLeave={handleLeave}
+              />
+            ))}
+          </SpeedDial>
+
+          {/* Hover Preview Popper */}
+          <Popper open={!!hoveredTheme && !!anchorEl} anchorEl={anchorEl} placement="left-start">
+            {hoveredTheme && (
+              <Paper sx={{ p: 1, display: 'flex', gap: 1, borderRadius: 2, boxShadow: 3 }}>
+                {['primary', 'secondary', 'background'].map((key) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const palette = (themes as any)[hoveredTheme].palette;
+                  const color =
+                    key === 'background'
+                      ? palette.background.default
+                      : palette[key as 'primary' | 'secondary'].main;
+                  return (
+                    <Box
+                      key={key}
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        bgcolor: color,
+                        borderRadius: 1,
+                        border: '1px solid #ccc',
+                      }}
+                      title={key}
+                    />
+                  );
+                })}
+                <Typography variant="caption" sx={{ alignSelf: 'center', ml: 1 }}>
+                  {hoveredTheme.replace(/Theme$/, '')}
+                </Typography>
+              </Paper>
+            )}
+          </Popper>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -27,6 +27,8 @@ import Type from '@/app/components/type';
 import Header from './components/header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import LoadingBackdrop from './components/LoadingBackdrop';
+import ProjectCardSkeleton from './components/ProjectSkeliton';
 
 const Title = styled(motion.h1)`
   font-size: 3.5rem;
@@ -40,10 +42,22 @@ const Title = styled(motion.h1)`
 
 export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingProjects, setLoadingProjects] = useState(true);
 
+  // async function fetchAll() {
+  //   const res = await axios.get('/api/projects/visible');
+  //   setProjects(res.data);
+  // }
   async function fetchAll() {
-    const res = await axios.get('/api/projects/visible');
-    setProjects(res.data);
+    try {
+      setLoadingProjects(true);
+      const res = await axios.get('/api/projects/visible');
+      setProjects(res.data);
+      console.log(res.data);
+    } finally {
+      setLoadingProjects(false);
+    }
   }
 
   useEffect(() => {
@@ -51,7 +65,7 @@ export default function HomePage() {
   }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const router = useRouter();
-  const recentProjects = projects.slice(-3);
+  const recentProjects = projects.slice(0, 3);
   const handleNavClick = (id: string) => {
     const section = document.getElementById(id);
     if (section) {
@@ -62,8 +76,17 @@ export default function HomePage() {
   };
 
   const handleViewDetails = (projectId: string | number) => {
+    setLoading(true);
     window.scrollTo(0, 0);
+
     router.push(`/project/${projectId}`);
+  };
+
+  const handleViewAllDetails = () => {
+    setLoading(true);
+    window.scrollTo(0, 0);
+
+    router.push(`/all-projects`);
   };
 
   // const AdminViewAll = () => {
@@ -138,56 +161,63 @@ export default function HomePage() {
           Recent Projects
         </Typography>
         <Grid container spacing={4}>
-          {recentProjects.map((project, idx) => (
-            <Grid key={idx} size={{ xs: 12, md: 4 }}>
-              <Card sx={{ borderRadius: 2, boxShadow: 3, height: '100%' }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={project.image} // Example: "/images/ecommerce.png" or external URL
-                  alt={project.title}
-                />
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {project.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {project.description}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
-                    View Details →
-                  </Button>
-                  {project.liveLink && (
-                    <Button
-                      size="small"
-                      component="a"
-                      href={project.liveLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Live Demo
-                    </Button>
-                  )}
-                  {project.githubLink && (
-                    <Button
-                      size="small"
-                      component="a"
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Source Code
-                    </Button>
-                  )}
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
+          {loadingProjects
+            ? Array.from(new Array(3)).map((_, index) => (
+                <Grid key={index} size={{ xs: 12, md: 4 }}>
+                  <ProjectCardSkeleton />
+                </Grid>
+              ))
+            : recentProjects.map((project, idx) => (
+                <Grid key={idx} size={{ xs: 12, md: 4 }}>
+                  <Card sx={{ borderRadius: 2, boxShadow: 3, height: '100%' }}>
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={project.image} // Example: "/images/ecommerce.png" or external URL
+                      alt={project.title}
+                    />
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {project.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {project.description}
+                        {/* {project.createdAt.toString() ?? "No Date available."} */}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
+                        View Details →
+                      </Button>
+                      {project.liveLink && (
+                        <Button
+                          size="small"
+                          component="a"
+                          href={project.liveLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Live Demo
+                        </Button>
+                      )}
+                      {project.githubLink && (
+                        <Button
+                          size="small"
+                          component="a"
+                          href={project.githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Source Code
+                        </Button>
+                      )}
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
         </Grid>
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Button variant="contained" href="/all-projects">
+          <Button variant="contained" onClick={() => handleViewAllDetails()}>
             View All Projects →
           </Button>
         </Box>
@@ -212,12 +242,13 @@ export default function HomePage() {
       <Paper
         component="footer"
         square
-        sx={{
+        sx={(theme) => ({
           mt: 8,
           p: 3,
           textAlign: 'center',
-          bgcolor: 'grey.100',
-        }}
+          bgcolor: theme.palette.background.paper, // use theme
+          color: theme.palette.text.primary, // optional, for text
+        })}
       >
         <Typography variant="body2">
           © {new Date().getFullYear()} Sanjith. All rights reserved.
@@ -238,6 +269,8 @@ export default function HomePage() {
           </IconButton>
         </Box>
       </Paper>
+
+      <LoadingBackdrop open={loading} />
     </Box>
   );
 }

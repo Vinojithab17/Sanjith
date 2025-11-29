@@ -16,6 +16,8 @@ export interface Project {
   teamSize: string;
   role: string;
   sections: Section[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface SubSection {
