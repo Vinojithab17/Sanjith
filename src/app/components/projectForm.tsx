@@ -1,15 +1,28 @@
 // components/ProjectForm.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { TextField, Button, Box, Chip, Typography, Grid, Paper, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import type { ProjectDoc } from '@/app/models/projects';
-import { v4 as uuidv4 } from 'uuid';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import {
+  Box,
+  Button,
+  Chip,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Paper,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import axios from 'axios';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { BlockMath } from 'react-katex';
+import { v4 as uuidv4 } from 'uuid';
 import { Project, Section, SubSection } from '../data/projectsData';
-import { Switch, FormControlLabel } from '@mui/material';
+import CollapsibleSection from './ColapsableComponent';
+
 type FormProps = {
   initial?: Partial<ProjectDoc>;
   onSaved?: (project: Project) => void;
@@ -50,7 +63,6 @@ export default function ProjectForm({
   const [teamSize, setTeamSize] = useState(initial.teamSize ?? '');
   const [role, setRole] = useState(initial.role ?? '');
   const [sections, setSections] = useState<Section[]>(initial.sections ?? []);
-
   useEffect(() => {
     // ensure sections have ids
     setSections((s) =>
@@ -157,6 +169,14 @@ export default function ProjectForm({
     const dataUrl = await fileToDataUrl(file);
     updateSection(secIdx, { image: dataUrl });
   }
+  async function handleSubSectionEqationChange(
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    secIdx: number,
+    subIdx: number
+  ) {
+    updateSubSection(secIdx, subIdx, { equation: e.target.value });
+  }
+
   async function handleSubSectionImageChange(
     e: React.ChangeEvent<HTMLInputElement>,
     secIdx: number,
@@ -469,211 +489,258 @@ export default function ProjectForm({
           <Grid size={{ xs: 12 }}>
             <Typography variant="h6">Sections</Typography>
             {sections.map((sec, si) => (
-              <Paper sx={{ p: 2, mb: 2 }} key={sec.id}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <TextField
-                    label="Heading"
-                    value={sec.heading}
-                    onChange={(e) => updateSection(si, { heading: e.target.value })}
-                  />
-                  <IconButton color="error" onClick={() => removeSection(si)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
+              <CollapsibleSection title={sec.heading} key={sec.id || si}>
+                <Paper sx={{ p: 2, mb: 2 }} key={sec.id}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <TextField
+                      label="Heading"
+                      value={sec.heading}
+                      onChange={(e) => updateSection(si, { heading: e.target.value })}
+                    />
+                    <IconButton color="error" onClick={() => removeSection(si)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
 
-                <Box sx={{ mt: 1 }}>
-                  <Typography variant="subtitle2">Paragraphs</Typography>
-                  {sec.content.map((c: string, ci: number) => (
-                    <Box
-                      key={ci}
-                      sx={{
-                        display: 'flex',
-                        gap: 1,
-                        alignItems: 'center',
-                        mt: 1,
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        multiline
-                        value={c}
-                        onChange={(e) => updateSectionContent(si, ci, e.target.value)}
-                      />
-                      <IconButton onClick={() => removeSectionParagraph(si, ci)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  ))}
-                  <Button onClick={() => addSectionParagraph(si)} startIcon={<AddIcon />}>
-                    Add paragraph
-                  </Button>
-                </Box>
-
-                <Box sx={{ mt: 1 }}>
-                  <Typography variant="subtitle2">Section image</Typography>
-                  {/* {sec.image && <Image alt={sec.heading} src={sec.image} style={{ maxWidth: 200, display: "block" }} />} */}
-                  {sec.image && (
-                    <Box
-                      sx={{
-                        maxWidth: 200,
-                        width: '100%',
-                        height: 'auto',
-                        position: 'relative',
-                        mb: 1,
-                      }}
-                    >
-                      <Image
-                        alt={sec.heading}
-                        src={sec.image}
-                        fill
-                        style={{ objectFit: 'contain', display: 'block' }}
-                      />
-                    </Box>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleSectionImageChange(e, si)}
-                  />
-                </Box>
-
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2">Subsections</Typography>
-                  {sec.subSections?.map((sub: SubSection, subi: number) => (
-                    <Paper key={sub.id} sx={{ p: 2, mt: 1 }}>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="subtitle2">Paragraphs</Typography>
+                    {sec.content.map((c: string, ci: number) => (
                       <Box
+                        key={ci}
                         sx={{
                           display: 'flex',
-                          justifyContent: 'space-between',
+                          gap: 1,
                           alignItems: 'center',
+                          mt: 1,
                         }}
                       >
                         <TextField
-                          label="Sub heading"
-                          value={sub.heading}
-                          onChange={(e) =>
-                            updateSubSection(si, subi, {
-                              heading: e.target.value,
-                            })
-                          }
+                          fullWidth
+                          multiline
+                          value={c}
+                          onChange={(e) => updateSectionContent(si, ci, e.target.value)}
                         />
-                        <IconButton color="error" onClick={() => removeSubSection(si, subi)}>
+                        <IconButton onClick={() => removeSectionParagraph(si, ci)}>
                           <DeleteIcon />
                         </IconButton>
                       </Box>
+                    ))}
+                    <Button onClick={() => addSectionParagraph(si)} startIcon={<AddIcon />}>
+                      Add paragraph
+                    </Button>
+                  </Box>
 
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="subtitle2">Content</Typography>
-                        {sub.content?.map((pc: string, pci: number) => (
-                          <Box
-                            key={pci}
-                            sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1 }}
-                          >
-                            <TextField
-                              fullWidth
-                              multiline
-                              value={pc}
-                              onChange={(e) =>
-                                updateSubSection(si, subi, {
-                                  content: sub.content?.map((x, idx) =>
-                                    idx === pci ? e.target.value : x
-                                  ),
-                                })
-                              }
-                            />
-                            <IconButton
-                              onClick={() =>
-                                updateSubSection(si, subi, {
-                                  content: sub.content?.filter((_, idx) => idx !== pci),
-                                })
-                              }
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                            <Button
-                              onClick={() =>
-                                updateSubSection(si, subi, {
-                                  content: [...(sub.content || []), ''],
-                                })
-                              }
-                              startIcon={<AddIcon />}
-                              sx={{ mt: 1 }}
-                            >
-                              Add paragraph
-                            </Button>
-                          </Box>
-                        ))}
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="subtitle2">Section image</Typography>
+                    {/* {sec.image && <Image alt={sec.heading} src={sec.image} style={{ maxWidth: 200, display: "block" }} />} */}
+                    {sec.image && (
+                      <Box
+                        sx={{
+                          maxWidth: 200,
+                          width: '100%',
+                          height: 'auto',
+                          position: 'relative',
+                          mb: 1,
+                        }}
+                      >
+                        <Image
+                          alt={sec.heading}
+                          src={sec.image}
+                          fill
+                          style={{ objectFit: 'contain', display: 'block' }}
+                        />
                       </Box>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSectionImageChange(e, si)}
+                    />
+                  </Box>
 
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="subtitle2">Points</Typography>
-                        {sub.points?.map((p: string, pi: number) => (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2">Subsections</Typography>
+                    {sec.subSections?.map((sub: SubSection, subi: number) => (
+                      <CollapsibleSection title={`${subi + 1} ${sub.heading}`} key={sub.id || subi}>
+                        <Paper key={sub.id} sx={{ p: 2, mt: 1 }}>
                           <Box
-                            key={pi}
                             sx={{
                               display: 'flex',
-                              gap: 1,
+                              justifyContent: 'space-between',
                               alignItems: 'center',
-                              mt: 1,
                             }}
                           >
                             <TextField
-                              fullWidth
-                              value={p}
-                              onChange={(e) => updatePoint(si, subi, pi, e.target.value)}
+                              label="Sub heading"
+                              value={sub.heading}
+                              onChange={(e) =>
+                                updateSubSection(si, subi, {
+                                  heading: e.target.value,
+                                })
+                              }
                             />
-                            <IconButton onClick={() => removePoint(si, subi, pi)}>
+                            <IconButton color="error" onClick={() => removeSubSection(si, subi)}>
                               <DeleteIcon />
                             </IconButton>
                           </Box>
-                        ))}
-                        <Button onClick={() => addPoint(si, subi, '')} startIcon={<AddIcon />}>
-                          Add point
-                        </Button>
-                      </Box>
 
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="subtitle2">Subsection image</Typography>
-                        {sub.image && (
-                          <Box
-                            sx={{
-                              maxWidth: 200,
-                              width: '100%',
-                              height: 150,
-                              position: 'relative',
-                              mb: 1,
-                            }}
-                          >
-                            <Image
-                              alt={sub.heading ?? ''}
-                              src={sub.image}
-                              fill
-                              style={{ objectFit: 'contain', display: 'block' }}
-                            />
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="subtitle2">Content</Typography>
+                            {sub.content?.map((pc: string, pci: number) => (
+                              <Box
+                                key={pci}
+                                sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1 }}
+                              >
+                                <TextField
+                                  fullWidth
+                                  multiline
+                                  value={pc}
+                                  onChange={(e) =>
+                                    updateSubSection(si, subi, {
+                                      content: sub.content?.map((x, idx) =>
+                                        idx === pci ? e.target.value : x
+                                      ),
+                                    })
+                                  }
+                                />
+                                <IconButton
+                                  onClick={() =>
+                                    updateSubSection(si, subi, {
+                                      content: sub.content?.filter((_, idx) => idx !== pci),
+                                    })
+                                  }
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                                <Button
+                                  onClick={() =>
+                                    updateSubSection(si, subi, {
+                                      content: [...(sub.content || []), ''],
+                                    })
+                                  }
+                                  startIcon={<AddIcon />}
+                                  sx={{ mt: 1 }}
+                                >
+                                  Add paragraph
+                                </Button>
+                              </Box>
+                            ))}
                           </Box>
-                        )}
 
-                        {/* {sub.image && <Image alt={sub.heading?? ""} src={sub.image} style={{ maxWidth: 200, display: "block" }} />} */}
-                        <input
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="subtitle2">Points</Typography>
+                            {sub.points?.map((p: string, pi: number) => (
+                              <Box
+                                key={pi}
+                                sx={{
+                                  display: 'flex',
+                                  gap: 1,
+                                  alignItems: 'center',
+                                  mt: 1,
+                                }}
+                              >
+                                <TextField
+                                  fullWidth
+                                  value={p}
+                                  onChange={(e) => updatePoint(si, subi, pi, e.target.value)}
+                                />
+                                <IconButton onClick={() => removePoint(si, subi, pi)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Box>
+                            ))}
+                            <Button onClick={() => addPoint(si, subi, '')} startIcon={<AddIcon />}>
+                              Add point
+                            </Button>
+                          </Box>
+
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="subtitle2">Equations</Typography>
+                            {sub.equation && (
+                              <div
+                                style={{
+                                  background: '#f5f5f5',
+                                  padding: 15,
+                                  borderRadius: 6,
+                                  minHeight: 60,
+                                }}
+                              >
+                                {sub.equation ? (
+                                  <BlockMath math={sub.equation} />
+                                ) : (
+                                  'Nothing to render'
+                                )}
+                              </div>
+                            )}
+
+                            {/* {sub.image && <Image alt={sub.heading?? ""} src={sub.image} style={{ maxWidth: 200, display: "block" }} />} */}
+                            {/* <input
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleSubSectionImageChange(e, si, subi)}
-                        />
-                      </Box>
-                    </Paper>
-                  ))}
+                        /> */}
+                            <textarea
+                              value={sub.equation}
+                              onChange={(e) => handleSubSectionEqationChange(e, si, subi)}
+                              placeholder="Type math like: \int_0^1 x^2 dx"
+                              style={{
+                                width: '100%',
+                                height: 80,
+                                padding: 10,
+                                borderRadius: 6,
+                                border: '1px solid #ccc',
+                              }}
+                            />
+                          </Box>
 
-                  <Button onClick={() => addSubSection(si)} startIcon={<AddIcon />} sx={{ mt: 1 }}>
-                    Add subsection
-                  </Button>
-                </Box>
-              </Paper>
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="subtitle2">Subsection image</Typography>
+                            {sub.image && (
+                              <Box
+                                sx={{
+                                  maxWidth: 200,
+                                  width: '100%',
+                                  height: 150,
+                                  position: 'relative',
+                                  mb: 1,
+                                }}
+                              >
+                                <Image
+                                  alt={sub.heading ?? ''}
+                                  src={sub.image}
+                                  fill
+                                  style={{ objectFit: 'contain', display: 'block' }}
+                                />
+                              </Box>
+                            )}
+
+                            {/* {sub.image && <Image alt={sub.heading?? ""} src={sub.image} style={{ maxWidth: 200, display: "block" }} />} */}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleSubSectionImageChange(e, si, subi)}
+                            />
+                          </Box>
+                        </Paper>
+                      </CollapsibleSection>
+                    ))}
+
+                    <Button
+                      onClick={() => addSubSection(si)}
+                      startIcon={<AddIcon />}
+                      sx={{ mt: 1 }}
+                    >
+                      Add subsection
+                    </Button>
+                  </Box>
+                </Paper>
+              </CollapsibleSection>
             ))}
 
             <Button onClick={addSection} startIcon={<AddIcon />}>

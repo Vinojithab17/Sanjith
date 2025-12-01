@@ -25,6 +25,7 @@ export interface SubSection {
   heading?: string;
   content?: string[];
   points?: string[];
+  equation?: string;
   image?: string;
 }
 

@@ -8,13 +8,14 @@ import ProjectForm from '@/app/components/projectForm';
 import { Project } from '@/app/data/projectsData';
 import Image from 'next/image';
 import AdminHeader from '@/app/components/adminHeader';
+import { usePrivateProjectStore } from '@/store/private-project-store';
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params?.id;
-
-  const [project, setProject] = useState<Project | null>(null);
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const getProject = usePrivateProjectStore((state) => state.getProjectById);
+  const [project, setProject] = useState<Project | null>(getProject(id || '') ?? null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
@@ -32,6 +33,7 @@ export default function ProjectDetailPage() {
     if (!user?.loggedIn || !id) return;
 
     const fetchProject = async () => {
+      if (project) return;
       try {
         const res = await fetch(`/api/projects/${id}`);
         if (!res.ok) throw new Error('Failed to fetch project');
@@ -44,7 +46,7 @@ export default function ProjectDetailPage() {
     };
 
     fetchProject();
-  }, [user, id]);
+  }, [user, id, project]);
 
   // 3️⃣ Conditional rendering
   if (!user) return <p>Loading...</p>;
@@ -76,6 +78,9 @@ export default function ProjectDetailPage() {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h4">{project.title}</Typography>
           <Box>
+            <Button variant="outlined" onClick={() => router.push(`/admin/projects/view/${id}`)}>
+              preview
+            </Button>
             <Button variant="outlined" onClick={() => router.push('/admin/projects')}>
               Back
             </Button>

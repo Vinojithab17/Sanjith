@@ -6,6 +6,7 @@ export interface SubSection {
   heading?: string;
   content?: string[]; // paragraphs
   points?: string[];
+  equation?: string;
   image?: string; // data URL
 }
 
@@ -43,6 +44,7 @@ const SubSectionSchema = new mongoose.Schema(
     heading: String,
     content: [String],
     points: [String],
+    equation: String,
     image: String,
   },
   { _id: false }

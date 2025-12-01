@@ -1,35 +1,35 @@
 'use client';
 
-import * as React from 'react';
-import {
-  Typography,
-  Button,
-  IconButton,
-  Box,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Paper,
-  Link,
-  CardActions,
-} from '@mui/material';
+import EmailIcon from '@mui/icons-material/Email';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import EmailIcon from '@mui/icons-material/Email';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Container,
+  Grid,
+  IconButton,
+  Link,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
+import * as React from 'react';
 import { Project } from './data/projectsData';
 
-import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import Type from '@/app/components/type';
-import Header from './components/header';
-import { useEffect, useState } from 'react';
+import { useProjectStore } from '@/store/public-project-store';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import Header from './components/header';
 import LoadingBackdrop from './components/LoadingBackdrop';
 import ProjectCardSkeleton from './components/ProjectSkeliton';
-
 const Title = styled(motion.h1)`
   font-size: 3.5rem;
   margin-bottom: 1rem;
@@ -41,28 +41,32 @@ const Title = styled(motion.h1)`
 `;
 
 export default function HomePage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(useProjectStore((state) => state.projects));
   const [loading, setLoading] = useState(false);
-  const [loadingProjects, setLoadingProjects] = useState(true);
-
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  // const publicProjects = useProjectStore((state) => state.projects);
+  const setPublicProjects = useProjectStore((state) => state.setProjects);
   // async function fetchAll() {
   //   const res = await axios.get('/api/projects/visible');
   //   setProjects(res.data);
   // }
   async function fetchAll() {
-    try {
-      setLoadingProjects(true);
-      const res = await axios.get('/api/projects/visible');
-      setProjects(res.data);
-      console.log(res.data);
-    } finally {
-      setLoadingProjects(false);
+    if (!projects || projects.length === 0) {
+      try {
+        setLoadingProjects(true);
+        const res = await axios.get('/api/projects/visible');
+        setProjects(res.data);
+        setPublicProjects(res.data);
+      } finally {
+        setLoadingProjects(false);
+      }
     }
   }
 
   useEffect(() => {
     fetchAll();
-  }, []);
+  });
+
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const router = useRouter();
   const recentProjects = projects.slice(0, 3);
@@ -112,12 +116,6 @@ export default function HomePage() {
           p: 4,
         }}
       >
-        {/* <h1 style={{ paddingBottom: 15 }} className="heading">
-          Hi There!{" "}
-          <span className="wave" role="img" aria-labelledby="wave">
-            👋🏻
-          </span>
-        </h1> */}
         <Title
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

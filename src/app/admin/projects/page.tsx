@@ -16,14 +16,16 @@ import ProjectForm from '../../components/projectForm';
 import { useRouter } from 'next/navigation';
 import { Project } from '@/app/data/projectsData';
 import AdminHeader from '@/app/components/adminHeader';
-
+import { usePrivateProjectStore } from '@/store/private-project-store';
 export default function ProjectsPage() {
   type User = {
     loggedIn: boolean;
     role?: string;
   };
   const [user, setUser] = useState<User | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(
+    usePrivateProjectStore((state) => state.projects)
+  );
   const [creating, setCreating] = useState(false);
 
   const router = useRouter();
@@ -60,12 +62,17 @@ export default function ProjectsPage() {
     );
 
   async function fetchAll() {
-    const res = await axios.get('/api/projects');
-    setProjects(res.data);
+    if (!projects || projects.length === 0) {
+      const res = await axios.get('/api/projects');
+      setProjects(res.data);
+    }
   }
 
   const handleEditView = (projectId: string) => {
     router.push(`/admin/projects/${projectId}`);
+  };
+  const handleView = (projectId: string) => {
+    router.push(`/admin/projects/view/${projectId}`);
   };
 
   // 3️⃣ AUTHORIZED CONTENT BELOW
@@ -119,9 +126,11 @@ export default function ProjectsPage() {
                         {p.visibility && <Typography variant="h6">Visibility : Public</Typography>}
                         <Box sx={{ mt: 1 }}>
                           <Button size="small" onClick={() => handleEditView(p._id ?? '')}>
-                            View / Edit
+                            Edit
                           </Button>
-
+                          <Button size="small" onClick={() => handleView(p._id ?? '')}>
+                            View
+                          </Button>
                           <Button
                             size="small"
                             onClick={async () => {

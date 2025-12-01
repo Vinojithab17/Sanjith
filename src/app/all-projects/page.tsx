@@ -26,13 +26,14 @@ import axios from 'axios';
 import { Project } from '../data/projectsData';
 import LoadingBackdrop from '../components/LoadingBackdrop';
 import ProjectCardSkeleton from '../components/ProjectSkeliton';
+import { useProjectStore } from '@/store/public-project-store';
 
 export default function AllProjects() {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingProjects, setLoadingProjects] = useState(false);
 
   const router = useRouter();
 
@@ -49,25 +50,30 @@ export default function AllProjects() {
 
   // const allProjects = projectsData
 
-  const [allProjects, setProjects] = useState<Project[]>([]);
-
+  const [allProjects, setProjects] = useState<Project[]>(
+    useProjectStore((state) => state.projects)
+  );
+  const setPublicProjects = useProjectStore((state) => state.setProjects);
   // async function fetchAll() {
   //   const res = await axios.get('/api/projects/visible');
   //   setProjects(res.data);
   // }
   async function fetchAll() {
-    try {
-      setLoadingProjects(true);
-      const res = await axios.get('/api/projects/visible');
-      setProjects(res.data);
-    } finally {
-      setLoadingProjects(false);
+    if (!allProjects || allProjects.length === 0) {
+      try {
+        setLoadingProjects(true);
+        const res = await axios.get('/api/projects/visible');
+        setProjects(res.data);
+        setPublicProjects(res.data);
+      } finally {
+        setLoadingProjects(false);
+      }
     }
   }
 
   useEffect(() => {
     fetchAll();
-  }, []);
+  });
 
   useEffect(() => {
     // This runs only when the page mounts
@@ -75,15 +81,6 @@ export default function AllProjects() {
       window.dispatchEvent(new Event('hide-loader'));
     }
   }, []);
-  // Filter projects
-  // const filteredProjects = allProjects.filter((project) => {
-  //   const matchesFilter =
-  //     filter === "all" || project.technologies.includes(filter);
-  //   const matchesSearch =
-  //     project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     project.description.toLowerCase().includes(searchTerm.toLowerCase());
-  //   return matchesFilter && matchesSearch;
-  // });
 
   // Filter projects
   const filteredProjects = allProjects.filter((project) => {
@@ -93,12 +90,6 @@ export default function AllProjects() {
       project.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
-  // .sort((a, b) => {
-  //   // Ensure numeric comparison even if id is string
-  //   const idA = typeof a.id === "string" ? parseInt(a.id, 10) : a.id;
-  //   const idB = typeof b.id === "string" ? parseInt(b.id, 10) : b.id;
-  //   return idB - idA; // descending → last element (highest id) first
-  // });
 
   const handleBackToHome = () => {
     router.push('/'); // navigate to home
@@ -119,7 +110,7 @@ export default function AllProjects() {
           <Box sx={{ flexGrow: 1 }} />
 
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button onClick={handleBackToHome}>← View All Projects</Button>
+            <Button onClick={handleBackToHome}>← Back to Home</Button>
           </Box>
         </Toolbar>
       </AppBar>

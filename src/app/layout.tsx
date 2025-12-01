@@ -12,6 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
+import 'katex/dist/katex.min.css';
 
 import {
   charcoalDarkTheme,
@@ -51,7 +52,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const [currentTheme, setCurrentTheme] = useState(neutralGreyTheme);
   const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
 
   const themeActions = Object.keys(themes).map((key) => ({
     name: key,
