@@ -1,23 +1,36 @@
 // models/Project.ts
 import mongoose, { Document, Model } from 'mongoose';
 
+// Column interface
+export interface Column {
+  id: string;
+  width?: number;
+  type: 'text' | 'image' | 'points' | 'equation';
+  content: string | string[]; // string for text/image/equation, string[] for bullet points
+}
+
+// SubSection interface
 export interface SubSection {
   id: string;
   heading?: string;
-  content?: string[]; // paragraphs
+  content?: string[];
   points?: string[];
   equation?: string;
   image?: string; // data URL
+  columns?: Column[];
 }
 
+// Section interface
 export interface Section {
   id: string;
   heading: string;
   content: string[];
   image?: string; // data URL
   subSections?: SubSection[];
+  columns?: Column[];
 }
 
+// Project document interface
 export interface ProjectDoc extends Document {
   visibility: boolean;
   title: string;
@@ -38,6 +51,18 @@ export interface ProjectDoc extends Document {
   updatedAt: Date;
 }
 
+// Column schema
+const ColumnSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true },
+    width: { type: Number, required: false },
+    type: { type: String, enum: ['text', 'image', 'points', 'equation'], required: true },
+    content: { type: mongoose.Schema.Types.Mixed, required: true }, // string or array
+  },
+  { _id: false }
+);
+
+// SubSection schema
 const SubSectionSchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
@@ -46,10 +71,12 @@ const SubSectionSchema = new mongoose.Schema(
     points: [String],
     equation: String,
     image: String,
+    columns: [ColumnSchema], // new dynamic columns
   },
   { _id: false }
 );
 
+// Section schema
 const SectionSchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
@@ -57,10 +84,12 @@ const SectionSchema = new mongoose.Schema(
     content: [String],
     image: String,
     subSections: [SubSectionSchema],
+    columns: [ColumnSchema],
   },
   { _id: false }
 );
 
+// Project schema
 const ProjectSchema = new mongoose.Schema(
   {
     visibility: Boolean,
@@ -82,8 +111,8 @@ const ProjectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Create or reuse model
 let ProjectModel: Model<ProjectDoc>;
-
 try {
   ProjectModel = mongoose.model<ProjectDoc>('Project');
 } catch {

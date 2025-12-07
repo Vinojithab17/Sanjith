@@ -33,7 +33,6 @@ import LoadingBackdrop from './LoadingBackdrop';
 export default function ProjectPreview() {
   const drawerWidth = 240;
   const params = useParams();
-  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [open, setOpen] = useState(false);
   const getProject = useProjectStore((state) => state.getProjectById);
@@ -61,8 +60,7 @@ export default function ProjectPreview() {
 
   // 2️⃣ Fetch project
   useEffect(() => {
-    if (!user?.loggedIn || !id) return;
-
+    if (!id) return;
     async function fetchProject() {
       if (!project) {
         setProjectLoading(true);
@@ -81,21 +79,6 @@ export default function ProjectPreview() {
 
     fetchProject();
   }, [user, id, project]);
-
-  // 3️⃣ Conditional rendering
-  if (!user) return <p>Loading...</p>;
-
-  if (!user.loggedIn)
-    return (
-      <Container sx={{ py: 8 }}>
-        <Typography variant="h6" color="error">
-          Not authorized — please login
-        </Typography>
-        <Button sx={{ mt: 2 }} onClick={() => router.push('/login')}>
-          Go to Login
-        </Button>
-      </Container>
-    );
 
   if (!project) {
     return (
@@ -231,27 +214,6 @@ export default function ProjectPreview() {
                 <Typography variant="h5" gutterBottom>
                   {section.heading}
                 </Typography>
-
-                {/* {section.content.map((para: string, i: number) => (
-                  <Typography key={i} component="p" sx={{ mb: 2, textAlign: 'justify' }}>
-                    {para}
-                  </Typography>
-                ))}
-                {section.image && (
-                  <Box
-                    component="img"
-                    src={section.image}
-                    alt={section.heading}
-                    sx={{
-                      display: 'block',
-                      mx: 'auto',
-                      width: { xs: '80%', sm: '60%', md: '50%' },
-                      borderRadius: 2,
-                      mt: 2,
-                    }}
-                  />
-                )} */}
-
                 <Box
                   sx={{
                     display: 'flex',
@@ -352,22 +314,240 @@ export default function ProjectPreview() {
                           />
                         )}
                       </Box>
-                      {/* {sub.image && (
-                          <Box
-                            component="img"
-                            src={sub.image}
-                            alt={sub.heading}
-                            sx={{
-                              display: 'block',
-                              mx: 'auto',
-                              width: { xs: '80%', sm: '60%', md: '50%' },
-                              borderRadius: 2,
-                              mt: 2,
-                            }}
-                          />
-                        )} */}
+
+                      {/* {sub.columns && sub.columns.length > 0 && (
+                        <Box
+                          sx={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                            gap: 3,
+                            mt: 2,
+                          }}
+                        >
+                          {sub.columns.map((col, idx) => (
+                            <Box key={idx} sx={{ p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+                              {col.type === 'text' && <Typography>{col.content}</Typography>}
+                              {col.type === 'image' && (
+                                <Box
+                                  component="img"
+                                  src={col.content as string}
+                                  alt=""
+                                  sx={{ width: '100%', borderRadius: 2 }}
+                                />
+                              )}
+                              {col.type === 'points' && (
+                                <List>
+                                  {Array.isArray(col.content) ? (
+                                    col.content.map((pt: string, i: number) => (
+                                      <ListItem key={i} sx={{ py: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 30 }}>
+                                          <CircleIcon sx={{ fontSize: 10 }} />
+                                        </ListItemIcon>
+                                        <Typography
+                                          sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                                        >
+                                          {pt}
+                                        </Typography>
+                                      </ListItem>
+                                    ))
+                                  ) : (
+                                    <ListItem sx={{ py: 0 }}>
+                                      <ListItemIcon sx={{ minWidth: 30 }}>
+                                        <CircleIcon sx={{ fontSize: 10 }} />
+                                      </ListItemIcon>
+                                      <Typography
+                                        sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                                      >
+                                        {col.content}
+                                      </Typography>
+                                    </ListItem>
+                                  )}
+                                </List>
+                              )}
+
+                              {col.type === 'equation' && (
+                                <Box
+                                  sx={{
+                                    my: 2,
+                                    textAlign: 'center',
+                                    transform: {
+                                      xs: 'scale(0.5)',
+                                      sm: 'scale(0.7)',
+                                      md: 'scale(1)',
+                                    },
+                                    transformOrigin: 'center',
+                                  }}
+                                >
+                                  {(Array.isArray(col.content) ? col.content : [col.content]).map(
+                                    (line, i) => (
+                                      <BlockMath key={i} math={line as string} />
+                                    )
+                                  )}
+                                </Box>
+                              )}
+                            </Box>
+                          ))}
+                        </Box>
+                      )} */}
+
+                      {sub.columns && sub.columns.length > 0 && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 3,
+                            mt: 2,
+                          }}
+                        >
+                          {sub.columns.map((col, idx) => (
+                            <Box
+                              key={idx}
+                              sx={{
+                                p: 2,
+                                border: '1px solid #ddd',
+                                borderRadius: 2,
+                                width: {
+                                  xs: '100%',
+                                  md: `${col.width}%`, // ← important!
+                                },
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              {col.type === 'text' && <Typography>{col.content}</Typography>}
+
+                              {col.type === 'image' && (
+                                <Box
+                                  component="img"
+                                  src={col.content as string}
+                                  alt=""
+                                  sx={{ width: '100%', borderRadius: 2 }}
+                                />
+                              )}
+
+                              {col.type === 'points' && (
+                                <List>
+                                  {(Array.isArray(col.content) ? col.content : [col.content]).map(
+                                    (pt, i) => (
+                                      <ListItem key={i} sx={{ py: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 30 }}>
+                                          <CircleIcon sx={{ fontSize: 10 }} />
+                                        </ListItemIcon>
+                                        <Typography
+                                          sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                                        >
+                                          {pt}
+                                        </Typography>
+                                      </ListItem>
+                                    )
+                                  )}
+                                </List>
+                              )}
+
+                              {col.type === 'equation' && (
+                                <Box
+                                  sx={{
+                                    my: 2,
+                                    textAlign: 'center',
+                                    transform: {
+                                      xs: 'scale(0.5)',
+                                      sm: 'scale(0.7)',
+                                      md: 'scale(1)',
+                                    },
+                                    transformOrigin: 'center',
+                                  }}
+                                >
+                                  {(Array.isArray(col.content) ? col.content : [col.content]).map(
+                                    (line, i) => (
+                                      <BlockMath key={i} math={line as string} />
+                                    )
+                                  )}
+                                </Box>
+                              )}
+                            </Box>
+                          ))}
+                        </Box>
+                      )}
                     </Box>
                   ))}
+
+                {/* Section Columns */}
+                {section.columns && section.columns.length > 0 && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 3,
+                      mt: 3,
+                    }}
+                  >
+                    {section.columns.map((col, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          p: 2,
+                          border: '1px solid #ddd',
+                          borderRadius: 2,
+                          width: {
+                            xs: '100%',
+                            md: `${col.width || 100}%`, // use width %, default 100%
+                          },
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        {col.type === 'text' && <Typography>{col.content}</Typography>}
+
+                        {col.type === 'image' && (
+                          <Box
+                            component="img"
+                            src={col.content as string}
+                            alt=""
+                            sx={{ width: '100%', borderRadius: 2 }}
+                          />
+                        )}
+
+                        {col.type === 'points' && (
+                          <List>
+                            {(Array.isArray(col.content) ? col.content : [col.content]).map(
+                              (pt, i) => (
+                                <ListItem key={i} sx={{ py: 0 }}>
+                                  <ListItemIcon sx={{ minWidth: 30 }}>
+                                    <CircleIcon sx={{ fontSize: 10 }} />
+                                  </ListItemIcon>
+                                  <Typography
+                                    sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                                  >
+                                    {pt}
+                                  </Typography>
+                                </ListItem>
+                              )
+                            )}
+                          </List>
+                        )}
+
+                        {col.type === 'equation' && (
+                          <Box
+                            sx={{
+                              my: 2,
+                              textAlign: 'center',
+                              transform: {
+                                xs: 'scale(0.5)',
+                                sm: 'scale(0.7)',
+                                md: 'scale(1)',
+                              },
+                              transformOrigin: 'center',
+                            }}
+                          >
+                            {(Array.isArray(col.content) ? col.content : [col.content]).map(
+                              (line, i) => (
+                                <BlockMath key={i} math={line as string} />
+                              )
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
               </Paper>
             </Grid>
           ))}

@@ -27,6 +27,7 @@ export interface SubSection {
   points?: string[];
   equation?: string;
   image?: string;
+  columns?: Column[];
 }
 
 export interface Section {
@@ -35,6 +36,14 @@ export interface Section {
   content: string[];
   image?: string;
   subSections?: SubSection[];
+  columns?: Column[];
+}
+
+interface Column {
+  id: string;
+  width?: number;
+  type: 'text' | 'image' | 'points' | 'equation';
+  content: string | string[]; // string for text/image, string[] for bullet points
 }
 
 // export const projectsData: Project[] = [

@@ -1,6 +1,6 @@
 // components/ProjectForm.tsx
 'use client';
-import type { ProjectDoc } from '@/app/models/projects';
+import type { Column, ProjectDoc } from '@/app/models/projects';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
@@ -120,8 +120,63 @@ export default function ProjectForm({
   function removeSection(idx: number) {
     setSections((s) => s.filter((_, i) => i !== idx));
   }
+  // function addColumnToSection(secIdx: number) {
+  //   setSections((prev) =>
+  //     prev.map((section, index): Section => {
+  //       if (index !== secIdx) return section;
+
+  //       const newColumn: Column = {
+  //         id: uuidv4(),
+  //         type: 'text',
+  //         content: '',
+  //       };
+
+  //       return {
+  //         ...section,
+  //         columns: [...(section.columns ?? []), newColumn],
+  //       };
+  //     })
+  //   );
+  // }
+
+  function removeColumnFromSection(secIdx: number, colIdx: number) {
+    setSections((s) =>
+      s.map((sec, i) =>
+        i === secIdx
+          ? {
+              ...sec,
+              columns: sec.columns?.filter((_, j) => j !== colIdx),
+            }
+          : sec
+      )
+    );
+  }
+
+  const addColumnToSection = (si: number) => {
+    updateSection(si, {
+      columns: [
+        ...(sections[si].columns || []),
+        { id: uuidv4(), type: 'text', content: '', width: 50 },
+      ],
+    });
+  };
 
   function addSubSection(secIdx: number) {
+    const sub = {
+      id: uuidv4(),
+      heading: 'New sub',
+      content: [''],
+      points: [],
+      image: undefined,
+    };
+    setSections((s) =>
+      s.map((sec, i) =>
+        i === secIdx ? { ...sec, subSections: [...(sec.subSections ?? []), sub] } : sec
+      )
+    );
+  }
+
+  function addColumnSection(secIdx: number) {
     const sub = {
       id: uuidv4(),
       heading: 'New sub',
@@ -739,6 +794,181 @@ export default function ProjectForm({
                       Add subsection
                     </Button>
                   </Box>
+
+                  <Typography variant="subtitle2">Columns</Typography>
+
+                  {sec.columns?.map((col, ci) => (
+                    <Paper key={col.id} sx={{ p: 2, mt: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <TextField
+                          label="Type"
+                          select
+                          value={col.type}
+                          onChange={(e) =>
+                            updateSection(si, {
+                              columns: sec.columns?.map((c, idx) =>
+                                idx === ci ? { ...c, type: e.target.value as Column['type'] } : c
+                              ),
+                            })
+                          }
+                          SelectProps={{ native: true }}
+                          sx={{ width: 160 }}
+                        >
+                          <option value="text">Text</option>
+                          <option value="points">Points</option>
+                          <option value="image">Image</option>
+                          <option value="equation">Equation</option>
+                        </TextField>
+                        <TextField
+                          label="Width (%)"
+                          type="number"
+                          sx={{ width: 120, mt: 1 }}
+                          value={col.width ?? 0}
+                          onChange={(e) =>
+                            updateSection(si, {
+                              columns: sec.columns?.map((c, idx) =>
+                                idx === ci ? { ...c, width: Number(e.target.value) } : c
+                              ),
+                            })
+                          }
+                        />
+
+                        <IconButton color="error" onClick={() => removeColumnFromSection(si, ci)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+
+                      {/* TEXT */}
+                      {col.type === 'text' && (
+                        <TextField
+                          fullWidth
+                          multiline
+                          label="Text"
+                          value={col.content as string}
+                          sx={{ mt: 1 }}
+                          onChange={(e) =>
+                            updateSection(si, {
+                              columns: sec.columns?.map((c, idx) =>
+                                idx === ci ? { ...c, content: e.target.value } : c
+                              ),
+                            })
+                          }
+                        />
+                      )}
+
+                      {/* EQUATION */}
+                      {col.type === 'equation' && (
+                        <TextField
+                          fullWidth
+                          multiline
+                          label="Equation"
+                          sx={{ mt: 1 }}
+                          value={col.content as string}
+                          onChange={(e) =>
+                            updateSection(si, {
+                              columns: sec.columns?.map((c, idx) =>
+                                idx === ci ? { ...c, content: e.target.value } : c
+                              ),
+                            })
+                          }
+                        />
+                      )}
+
+                      {/* POINTS */}
+                      {col.type === 'points' && (
+                        <>
+                          {(Array.isArray(col.content) ? col.content : []).map((point, pi) => (
+                            <Box sx={{ display: 'flex', gap: 1, mt: 1 }} key={pi}>
+                              <TextField
+                                fullWidth
+                                value={point}
+                                label={`Point ${pi + 1}`}
+                                onChange={(e) =>
+                                  updateSection(si, {
+                                    columns: sec.columns?.map((c, idx) =>
+                                      idx === ci
+                                        ? {
+                                            ...c,
+                                            content: (c.content as string[]).map((p, j) =>
+                                              j === pi ? e.target.value : p
+                                            ),
+                                          }
+                                        : c
+                                    ),
+                                  })
+                                }
+                              />
+
+                              <IconButton
+                                onClick={() =>
+                                  updateSection(si, {
+                                    columns: sec.columns?.map((c, idx) =>
+                                      idx === ci
+                                        ? {
+                                            ...c,
+                                            content: (c.content as string[]).filter(
+                                              (_, j) => j !== pi
+                                            ),
+                                          }
+                                        : c
+                                    ),
+                                  })
+                                }
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Box>
+                          ))}
+
+                          <Button
+                            sx={{ mt: 1 }}
+                            startIcon={<AddIcon />}
+                            onClick={() =>
+                              updateSection(si, {
+                                columns: sec.columns?.map((c, idx) =>
+                                  idx === ci
+                                    ? {
+                                        ...c,
+                                        content: [...((c.content as string[]) || []), ''],
+                                      }
+                                    : c
+                                ),
+                              })
+                            }
+                          >
+                            Add point
+                          </Button>
+                        </>
+                      )}
+
+                      {/* IMAGE */}
+                      {col.type === 'image' && (
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ marginTop: 12 }}
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const dataUrl = await fileToDataUrl(file);
+                            updateSection(si, {
+                              columns: sec.columns?.map((c, idx) =>
+                                idx === ci ? { ...c, content: dataUrl } : c
+                              ),
+                            });
+                          }}
+                        />
+                      )}
+                    </Paper>
+                  ))}
+
+                  <Button
+                    startIcon={<AddIcon />}
+                    sx={{ mt: 1 }}
+                    onClick={() => addColumnToSection(si)}
+                  >
+                    Add column
+                  </Button>
                 </Paper>
               </CollapsibleSection>
             ))}
