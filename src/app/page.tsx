@@ -30,6 +30,7 @@ import styled from 'styled-components';
 import Header from './components/header';
 import LoadingBackdrop from './components/LoadingBackdrop';
 import ProjectCardSkeleton from './components/ProjectSkeliton';
+import { Types } from 'mongoose';
 const Title = styled(motion.h1)`
   font-size: 3.5rem;
   margin-bottom: 1rem;
@@ -79,7 +80,7 @@ export default function HomePage() {
     setMobileMenuOpen(false);
   };
 
-  const handleViewDetails = (projectId: string | number) => {
+  const handleViewDetails = (projectId: Types.ObjectId | undefined) => {
     setLoading(true);
     window.scrollTo(0, 0);
 
@@ -184,7 +185,7 @@ export default function HomePage() {
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
+                      <Button size="small" onClick={() => handleViewDetails(project._id)}>
                         View Details →
                       </Button>
                       {project.liveLink && (

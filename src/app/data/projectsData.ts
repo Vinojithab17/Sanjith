@@ -1,6 +1,6 @@
-// Project type definition
+import { Types } from 'mongoose';
 export interface Project {
-  _id?: string;
+  _id?: Types.ObjectId;
   visibility: boolean;
   title: string;
   description: string;

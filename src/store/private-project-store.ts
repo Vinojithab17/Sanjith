@@ -1,4 +1,5 @@
 import { Project } from '@/app/data/projectsData';
+import { Types } from 'mongoose';
 import { create } from 'zustand';
 
 interface PrivateProjectStoreState {
@@ -6,8 +7,8 @@ interface PrivateProjectStoreState {
   setProjects: (projects: Project[]) => void;
   addProject: (project: Project) => void;
   updateProject: (project: Project) => void;
-  getProjectById: (id: string) => Project | undefined;
-  removeProject: (id: string) => void;
+  getProjectById: (id: Types.ObjectId | string) => Project | undefined;
+  removeProject: (id: Types.ObjectId) => void;
 }
 
 export const usePrivateProjectStore = create<PrivateProjectStoreState>((set, get) => ({
@@ -29,12 +30,12 @@ export const usePrivateProjectStore = create<PrivateProjectStoreState>((set, get
     })),
 
   // Get project by id
-  getProjectById: (id: string) => {
+  getProjectById: (id: Types.ObjectId | string) => {
     return get().projects.find((p) => p._id === id);
   },
 
   // Optional: remove project
-  removeProject: (id: string) =>
+  removeProject: (id: Types.ObjectId | string) =>
     set((state) => ({
       projects: state.projects.filter((p) => p._id !== id),
     })),

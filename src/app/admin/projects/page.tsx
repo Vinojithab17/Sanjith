@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { Project } from '@/app/data/projectsData';
 import AdminHeader from '@/app/components/adminHeader';
 import { usePrivateProjectStore } from '@/store/private-project-store';
+import { Types } from 'mongoose';
 export default function ProjectsPage() {
   type User = {
     loggedIn: boolean;
@@ -68,10 +69,10 @@ export default function ProjectsPage() {
     }
   }
 
-  const handleEditView = (projectId: string) => {
+  const handleEditView = (projectId: Types.ObjectId | undefined) => {
     router.push(`/admin/projects/${projectId}`);
   };
-  const handleView = (projectId: string) => {
+  const handleView = (projectId: Types.ObjectId | undefined) => {
     router.push(`/admin/projects/view/${projectId}`);
   };
 
@@ -107,7 +108,7 @@ export default function ProjectsPage() {
 
             <Grid container spacing={2}>
               {projects.map((p) => (
-                <Grid key={p._id} size={{ xs: 12 }}>
+                <Grid key={p._id?.toString()} size={{ xs: 12 }}>
                   <Card>
                     <CardContent sx={{ display: 'flex', gap: 2 }}>
                       {p.image && (
@@ -125,10 +126,10 @@ export default function ProjectsPage() {
                         )}
                         {p.visibility && <Typography variant="h6">Visibility : Public</Typography>}
                         <Box sx={{ mt: 1 }}>
-                          <Button size="small" onClick={() => handleEditView(p._id ?? '')}>
+                          <Button size="small" onClick={() => handleEditView(p._id)}>
                             Edit
                           </Button>
-                          <Button size="small" onClick={() => handleView(p._id ?? '')}>
+                          <Button size="small" onClick={() => handleView(p._id)}>
                             View
                           </Button>
                           <Button

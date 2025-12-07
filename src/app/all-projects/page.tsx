@@ -27,6 +27,7 @@ import { Project } from '../data/projectsData';
 import LoadingBackdrop from '../components/LoadingBackdrop';
 import ProjectCardSkeleton from '../components/ProjectSkeliton';
 import { useProjectStore } from '@/store/public-project-store';
+import { Types } from 'mongoose';
 
 export default function AllProjects() {
   const [filter, setFilter] = useState('all');
@@ -41,7 +42,7 @@ export default function AllProjects() {
   //   window.scrollTo(0, 0);
   //   router.push(`/project/${projectId}`);
   // };
-  const handleViewDetails = (projectId: string | number) => {
+  const handleViewDetails = (projectId: Types.ObjectId | undefined) => {
     setLoading(true);
     window.scrollTo(0, 0);
 
@@ -173,7 +174,7 @@ export default function AllProjects() {
               </Grid>
             ))
           : filteredProjects.map((project) => (
-              <Grid size={{ xs: 12 }} key={project._id}>
+              <Grid size={{ xs: 12 }} key={project._id?.toString()}>
                 <Card
                   sx={{
                     display: 'flex',
@@ -233,7 +234,7 @@ export default function AllProjects() {
 
                     {/* Actions */}
                     <CardActions>
-                      <Button size="small" onClick={() => handleViewDetails(project._id ?? '')}>
+                      <Button size="small" onClick={() => handleViewDetails(project._id)}>
                         View Details →
                       </Button>
                       {project.liveLink && (
